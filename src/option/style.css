@@ -1,0 +1,22 @@
+html,
+body {
+  margin: 0px 5px 5px;
+}
+
+textarea {
+  resize: horizontal;
+}
+
+.main h2 {
+  margin: 0px, 0px, 0px, 0px;
+  padding: 0px;
+}
+
+.main p {
+  margin: 5px;
+  padding: 0px;
+}
+
+.body_text {
+  margin-left: 20px;
+}

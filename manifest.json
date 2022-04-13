@@ -1,0 +1,31 @@
+{
+  "manifest_version": 2,
+  "name": "Firefox-Template",
+  "version": "0.0.1",
+
+  "description": "",
+  "homepage_url": "https://github.com/OkanoShinri/Firefox-Template",
+  "icons": {
+    "48": "icons/48.png",
+    "96": "icons/96.png"
+  },
+
+  "permissions": ["<all_urls>", "storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": []
+    }
+  ],
+  "browser_action": {
+    "default_icon": "icons/32.png",
+    "default_title": "Firefox-Template",
+    "default_popup": "src/popup/popup.html"
+  },
+  "options_ui": {
+    "page": "src/option/options.html"
+  },
+  "background": {
+    "scripts": ["src/background-scripts/background.js"]
+  }
+}

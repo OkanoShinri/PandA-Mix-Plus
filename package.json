@@ -1,0 +1,26 @@
+{
+  "name": "firefox-template",
+  "version": "0.0.1",
+  "description": "",
+  "main": "manifest.json",
+  "scripts": {
+    "build": "web-ext build --overwrite-dest",
+    "run": "web-ext run",
+    "wlint": "web-ext lint",
+    "elint": "eslint src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OkanoShinri/Firefox-Template.git"
+  },
+  "author": "OkanoShinri",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OkanoShinri/Firefox-Template/issues"
+  },
+  "homepage": "https://github.com/OkanoShinri/Firefox-Template#readme",
+  "devDependencies": {
+    "eslint": "^8.11.0",
+    "web-ext": "^6.7.0"
+  }
+}
