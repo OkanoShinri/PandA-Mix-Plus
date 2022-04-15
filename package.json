@@ -1,5 +1,5 @@
 {
-  "name": "firefox-template",
+  "name": "panda-mix-plus",
   "version": "0.0.1",
   "description": "",
   "main": "manifest.json",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OkanoShinri/Firefox-Template.git"
+    "url": "git+https://github.com/OkanoShinri/PandA-Mix-Plus.git"
   },
   "author": "OkanoShinri",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/OkanoShinri/Firefox-Template/issues"
+    "url": "https://github.com/OkanoShinri/PandA-Mix-Plus/issues"
   },
-  "homepage": "https://github.com/OkanoShinri/Firefox-Template#readme",
+  "homepage": "https://github.com/OkanoShinri/PandA-Mix-Plus#readme",
   "devDependencies": {
     "eslint": "^8.11.0",
     "web-ext": "^6.7.0"

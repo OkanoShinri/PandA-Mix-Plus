@@ -1,2 +1,4 @@
-# Firefox-Template
-Firefox 拡張機能のテンプレート
+# PandA-Mix-Plus
+
+PandAを時間割のように表示したりするアドオン
+由来は時間割が多段タブのように見えることから
