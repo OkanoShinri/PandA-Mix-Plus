@@ -1,8 +1,8 @@
 (function () {
-  var newStyle = document.createElement("style");
+  /*var newStyle = document.createElement("style");
   newStyle.type = "text/css";
   // CSSの内容を書く
-  /*newStyle.innerText =
+  newStyle.innerText =
     ".classe-dropdown-menu {\
   position: relative;\
   }\
@@ -41,11 +41,8 @@
   home_link.setAttribute("href", home_ref);
   logo.appendChild(home_link);
 
-  //let classes = new Array(25);
-  //classes.fill("___");
-  let kadai_urls = new Array();
-  let site_ids = new Array();
   let time_table = document.createElement("table");
+  time_table.style.marginTop = "10px";
   let time_table_head = document.createElement("thead");
   let time_table_body = document.createElement("tbody");
   time_table.appendChild(time_table_head);
@@ -92,46 +89,6 @@
     document.querySelectorAll(".fav-sites-entry")
   );
 
-  /*ここから
-  for (let index = 0; index < source_classes.length; index++) {
-    const source_element = source_classes[index];
-    let title = source_element
-      .querySelector(".fav-title")
-      .querySelector("a")
-      .getAttribute("title");
-    if (!title.includes("2022")) {
-      continue;
-    }
-    let href = source_element
-      .querySelector(".fav-title")
-      .querySelector("a")
-      .getAttribute("href");
-    let copy = document.createElement("div");
-    copy.classList.add("time-table");
-
-    let link_container = document.createElement("a");
-    link_container.classList.add("link-container");
-    link_container.setAttribute("href", href);
-    link_container.setAttribute("title", title);
-    let _title = document.createElement("span");
-    _title.textContent = title.split("]").pop();
-    link_container.appendChild(_title);
-    copy.appendChild(link_container);
-    copy.style = `margin: 0px; padding: 0px 10px; width: ${_width}px; height: 40px;`;
-
-    let is_syuutyuu = true;
-    for (let j = 0; j < periods.length; j++) {
-      if (title.includes(periods[j])) {
-        classes[j] = copy;
-        is_syuutyuu = false;
-      }
-    }
-    if (is_syuutyuu) {
-      classes.push(copy);
-    }
-  }
-  */
-  //ここまでを関数として切り出す
   makeClassElements(source_classes).then((classes) => {
     var row = document.createElement("tr");
     let td = document.createElement("td");
@@ -228,11 +185,11 @@
         let _title = document.createElement("span");
         _title.textContent = title.split("]").pop();
         link_container.appendChild(_title);
+        copy.appendChild(link_container);
 
         //dropdownメニューを作成
         let dropdown = document.createElement("div");
         dropdown.classList.add("classe-dropdown");
-        //dropdown.style="display: block;z-index: 1;position: relative;top: -10px;background-color: wheat;"
         dropdown.style = "display: none;";
         let dropdown_menu = document.createElement("ul");
         dropdown_menu.classList.add("classe-dropdown-list");
@@ -242,15 +199,23 @@
           let _a = document.createElement("a");
           _a.setAttribute("href", link);
           _a.textContent = title;
-          _a.style = "width: 100%;"; // width:100%; height:100%;"
+          _a.style = "width:100%;";
 
           let _li = document.createElement("li");
           _li.appendChild(_a);
-          _li.style = "list-style: none; margin: 5px; width: 100%;";
+
+          if (title == "課題") {
+            const _kadai_status = await getKadaiStatus(id);
+            if (_kadai_status > 0) {
+              _li.appendChild(_makeKadaiStatusElem(_kadai_status));
+              copy.appendChild(_makeKadaiIconElem(_kadai_status));
+            }
+          }
+
+          _li.style = "list-style: none; width:100%; margin: 5px;";
           dropdown_menu.appendChild(_li);
         }
 
-        copy.appendChild(link_container);
         dropdown.appendChild(dropdown_menu);
         copy.appendChild(dropdown);
 
@@ -258,7 +223,7 @@
           "mouseover",
           function () {
             copy.querySelector(".classe-dropdown").style =
-              "display: block; z-index: 1; position: relative;top: -10px; background-color: wheat;";
+              "display: block; z-index: 1; position: relative;width: 80%; background-color: white; border: 1px solid; border-radius:10px;";
           },
           false
         );
@@ -284,5 +249,98 @@
     );
 
     return classes;
+  }
+  async function getKadaiStatus(id) {
+    //0: 無し 1:1週間以上 2:1週間以内 3:1日以内
+    //
+    let kadai_status = 0;
+    const kadai_fetch = await fetch(
+      `https://panda.ecs.kyoto-u.ac.jp/direct/assignment/site/${id}/pages.json`
+    )
+      .then((response) => response.json())
+      .catch(() => new Response());
+
+    const kadai_list = kadai_fetch["assignment_collection"];
+    for (let index = 0; index < kadai_list.length; index++) {
+      const kadai_info = kadai_list[index];
+      if (kadai_info.status == "OPEN") {
+        if (_getKadaiLimitID(kadai_info.dropDeadTimeString) > kadai_status) {
+          kadai_status = _getKadaiLimitID(kadai_info.dropDeadTimeString);
+        }
+      }
+    }
+    return kadai_status;
+  }
+
+  function _getKadaiLimitID(date) {
+    let res = 1;
+    const ts = Date.parse(date);
+    const limit = new Date(ts);
+    const now = new Date();
+    const delta = (limit - now) / 86400000;
+    if (delta < 1) {
+      res = 3;
+    } else if (delta < 7) {
+      res = 2;
+    } else {
+      res = 1;
+    }
+    return res;
+  }
+
+  function _makeKadaiStatusElem(kadai_status) {
+    let _kadai_status_elm = document.createElement("span");
+    switch (kadai_status) {
+      case 0:
+        _kadai_status_elm.textContent = "";
+        break;
+      case 1:
+        _kadai_status_elm.textContent = "課題あり";
+        _kadai_status_elm.style.color = "#FF4500";
+        _kadai_status_elm.style.marginLeft = "10px";
+        break;
+      case 2:
+        _kadai_status_elm.textContent = "<1週間以内>";
+        _kadai_status_elm.style.color = "#FF0000";
+        _kadai_status_elm.style.marginLeft = "10px";
+        break;
+      case 3:
+        _kadai_status_elm.textContent = "<<<24時間以内>>>";
+        _kadai_status_elm.style.color = "#8B0000";
+        _kadai_status_elm.style.marginLeft = "10px";
+        break;
+      default:
+        _kadai_status_elm.textContent = "";
+        break;
+    }
+    return _kadai_status_elm;
+  }
+
+  function _makeKadaiIconElem(kadai_status) {
+    let _kadai_icon_elm = document.createElement("span");
+    switch (kadai_status) {
+      case 0:
+        _kadai_icon_elm.textContent = "";
+        break;
+      case 1:
+        _kadai_icon_elm.textContent = "●";
+        _kadai_icon_elm.style.color = "#FF4500";
+        _kadai_icon_elm.style.marginLeft = "10px";
+        break;
+      case 2:
+        _kadai_icon_elm.textContent = "●";
+        _kadai_icon_elm.style.color = "#DC143C";
+        _kadai_icon_elm.style.marginLeft = "10px";
+        break;
+      case 3:
+        _kadai_icon_elm.textContent = "●";
+        _kadai_icon_elm.style.color = "#8B0000";
+        _kadai_icon_elm.style.marginLeft = "10px";
+        break;
+      default:
+        _kadai_icon_elm.textContent = "";
+        break;
+    }
+    return _kadai_icon_elm;
   }
 })();

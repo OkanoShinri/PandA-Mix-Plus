@@ -4,7 +4,7 @@
   "description": "",
   "main": "manifest.json",
   "scripts": {
-    "build": "web-ext build --overwrite-dest",
+    "build": "web-ext build --overwrite-dest --ignore-files 'sakai/*'" ,
     "run": "web-ext run",
     "wlint": "web-ext lint",
     "elint": "eslint src"
