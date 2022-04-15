@@ -1,6 +1,6 @@
 # PandA-Mix-Plus
 
-https://addons.mozilla.org/ja/firefox/addon/panda-mix-plus/
+[https://addons.mozilla.org/ja/firefox/addon/panda-mix-plus/](https://addons.mozilla.org/ja/firefox/addon/panda-mix-plus/)
 
 PandAを時間割のように表示したりするアドオン  
 由来は時間割が多段タブのように見えることから
