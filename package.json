@@ -1,10 +1,10 @@
 {
   "name": "panda-mix-plus",
-  "version": "0.0.4",
-  "description": "",
+  "version": "0.0.5",
+  "description": "This add-on makes it easier to use PandA, Kyoto University's learning support system.",
   "main": "manifest.json",
   "scripts": {
-    "build": "web-ext build --overwrite-dest --ignore-files 'sakai/*'" ,
+    "build": "web-ext build --overwrite-dest --ignore-files package-lock.json",
     "run": "web-ext run",
     "wlint": "web-ext lint",
     "elint": "eslint src"

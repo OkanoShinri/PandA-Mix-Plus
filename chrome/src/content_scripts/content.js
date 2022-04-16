@@ -1,16 +1,8 @@
 (function () {
   let row_is_period = false;
-  browser.storage.local
-    .get("row_is_period")
-    .then((restoredSettings) => {
-      row_is_period = restoredSettings.row_is_period;
-    })
-    .catch((e) => {
-      console.log(e);
-      browser.storage.local.set({
-        row_is_period: row_is_period,
-      });
-    });
+  chrome.storage.local.get("row_is_period", (restoredSettings) => {
+    row_is_period = restoredSettings.row_is_period;
+  });
 
   let b = document.querySelector(".pasystem-banner-alerts");
   b.style.display = "none";
@@ -23,13 +15,15 @@
     .querySelector(".link-container")
     .getAttribute("href");
   let logo = document.querySelector(".Mrphs-headerLogo--institution");
-  logo.style.position = "relative";
-  let home_link = document.createElement("a");
-  home_link.style =
-    "position: absolute; top: 0; left: 0; width:100%; height:100%;";
+  if (logo) {
+    logo.style.position = "relative";
+    let home_link = document.createElement("a");
+    home_link.style =
+      "position: absolute; top: 0; left: 0; width:100%; height:100%;";
 
-  home_link.setAttribute("href", home_ref);
-  logo.appendChild(home_link);
+    home_link.setAttribute("href", home_ref);
+    logo.appendChild(home_link);
+  }
 
   const periods = [
     "月１",
@@ -103,7 +97,7 @@
           document.querySelector(".week-time-table").style.display = "none";
         }
         row_is_period = !row_is_period;
-        browser.storage.local.set({
+        chrome.storage.local.set({
           row_is_period: row_is_period,
         });
       },
