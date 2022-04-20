@@ -1,4 +1,5 @@
 (function () {
+  //縦横切り替えの設定
   let row_is_period = false;
   browser.storage.local
     .get("row_is_period")
@@ -12,17 +13,21 @@
       });
     });
 
-  let b = document.querySelector(".pasystem-banner-alerts");
+  //通知エリアの削除
+  let b = document.getElementsByClassName("pasystem-banner-alerts")[0];
   b.style.display = "none";
 
-  let top_nav = document.querySelector("#topnav_container");
-  document.querySelector("#topnav").style.display = "none";
+  //ロゴにリンク張る
+  let top_nav = document.getElementById("topnav_container");
+  document.getElementById("topnav").style.display = "none";
   let home_ref = document
-    .querySelector("#topnav")
+    .getElementById("topnav")
     .querySelector("li")
-    .querySelector(".link-container")
+    .getElementsByClassName("link-container")[0]
     .getAttribute("href");
-  let logo = document.querySelector(".Mrphs-headerLogo--institution");
+  let logo = document.getElementsByClassName(
+    "Mrphs-headerLogo--institution"
+  )[0];
   logo.style.position = "relative";
   let home_link = document.createElement("a");
   home_link.style =
@@ -31,6 +36,34 @@
   home_link.setAttribute("href", home_ref);
   logo.appendChild(home_link);
 
+  //提出済み課題生成機能
+  let post_button = document.getElementById("post");
+  if (post_button !== null) {
+    let id = document
+      .getElementsByName("assignmentId")
+      .item(0)
+      .value.split("/")
+      .pop();
+    browser.storage.local.get().then((restoredSettings) => {
+      let submitted_assignments = restoredSettings.submitted_assignments;
+      if (submitted_assignments.length > 10) {
+        submitted_assignments.shift();
+      }
+
+      post_button.addEventListener(
+        "click",
+        () => {
+          submitted_assignments.push(id);
+          browser.storage.local.set({
+            submitted_assignments: submitted_assignments,
+          });
+        },
+        false
+      );
+    });
+  }
+
+  //時間割機能
   const periods = [
     "月１",
     "月２",
@@ -69,7 +102,7 @@
   const _width = (document.body.clientWidth - 160) / 5;
 
   let source_classes = [].slice.call(
-    document.querySelectorAll(".fav-sites-entry")
+    document.getElementsByClassName("fav-sites-entry")
   );
 
   makeClassElements(source_classes).then((classes) => {
@@ -94,13 +127,20 @@
       "click",
       function () {
         if (
-          document.querySelector(".period-time-table").style.display === "block"
+          document.getElementsByClassName("period-time-table")[0].style
+            .display === "block"
         ) {
-          document.querySelector(".period-time-table").style.display = "none";
-          document.querySelector(".week-time-table").style.display = "block";
+          document.getElementsByClassName(
+            "period-time-table"
+          )[0].style.display = "none";
+          document.getElementsByClassName("week-time-table")[0].style.display =
+            "block";
         } else {
-          document.querySelector(".period-time-table").style.display = "block";
-          document.querySelector(".week-time-table").style.display = "none";
+          document.getElementsByClassName(
+            "period-time-table"
+          )[0].style.display = "block";
+          document.getElementsByClassName("week-time-table")[0].style.display =
+            "none";
         }
         row_is_period = !row_is_period;
         browser.storage.local.set({
@@ -114,17 +154,17 @@
     window.addEventListener("resize", function () {
       const new_width = (document.body.clientWidth - 160) / 5;
 
-      let _week = this.document.querySelectorAll(".week");
+      let _week = this.document.getElementsByClassName("week");
       for (let index = 0; index < _week.length; index++) {
         _week[index].style.width = `${new_width}px`;
       }
 
-      let _period = this.document.querySelectorAll(".period");
+      let _period = this.document.getElementsByClassName("period");
       for (let index = 0; index < _period.length; index++) {
         _period[index].style.width = `${new_width}px`;
       }
 
-      let _time_tables = this.document.querySelectorAll(".time-table");
+      let _time_tables = this.document.getElementsByClassName("time-table");
       for (let index = 0; index < _time_tables.length; index++) {
         _time_tables[index].style.width = `${new_width}px`;
       }
@@ -133,7 +173,7 @@
 
   async function makeClassElements(source_classes) {
     const _Width = (document.body.clientWidth - 160) / 5;
-    const Classelement_style = `display:block; margin: 0px; padding: 5px; width: ${_Width}px; height: 40px; border-radius:10px;`;
+    const Classelement_style = `display:block; margin: 0px; padding: 5px; width: ${_Width}px; min-height: 40px; border-radius:10px;`;
 
     let classes = new Array(25);
     classes.fill("___");
@@ -141,14 +181,14 @@
       source_classes.map(async (source_class) => {
         const source_element = source_class;
         let title = source_element
-          .querySelector(".fav-title")
+          .getElementsByClassName("fav-title")[0]
           .querySelector("a")
           .getAttribute("title");
         if (!title.includes("2022")) {
           return;
         }
         let id = source_element
-          .querySelector(".fav-title")
+          .getElementsByClassName("fav-title")[0]
           .querySelector("a")
           .getAttribute("href")
           .split("/")
@@ -213,6 +253,7 @@
 
           if (title == "課題") {
             const kadai_time_left = await getKadaiTimeLeft(id);
+
             if (kadai_time_left > 0) {
               _div.appendChild(_makeKadaiStatusElem(kadai_time_left));
               copy.appendChild(_makeKadaiIconElem(kadai_time_left));
@@ -226,24 +267,6 @@
 
         dropdown.appendChild(dropdown_menu);
         copy.appendChild(dropdown);
-
-        copy.addEventListener(
-          "mouseover",
-          function () {
-            copy.style.backgroundColor = "#D3D3D3";
-            copy.querySelector(".classe-dropdown").style =
-              "display: block; z-index: 99; position: relative;width: 70%; background-color: white; border: 1px solid; border-radius:10px;";
-          },
-          false
-        );
-        copy.addEventListener(
-          "mouseout",
-          function () {
-            copy.style.backgroundColor = "";
-            copy.querySelector(".classe-dropdown").style = "display: none;";
-          },
-          false
-        );
 
         _class.appendChild(copy);
 
@@ -272,10 +295,16 @@
       .then((response) => response.json())
       .catch(() => new Response());
 
+    const restored = await browser.storage.local.get(["submitted_assignments"]);
+    const submitted_kadai = restored.submitted_assignments;
+
     const kadai_list = kadai_fetch["assignment_collection"];
     for (let index = 0; index < kadai_list.length; index++) {
       const kadai_info = kadai_list[index];
-      if (kadai_info.status == "OPEN") {
+      if (
+        !submitted_kadai.includes(kadai_info.id) &&
+        kadai_info.status == "OPEN"
+      ) {
         if (_getMsTimeLeft(kadai_info.dropDeadTimeString) < left) {
           left = _getMsTimeLeft(kadai_info.dropDeadTimeString);
         }
@@ -313,12 +342,8 @@
       _kadai_status_elm.textContent = `あと${hour}時間`;
       _kadai_status_elm.style.color = "red";
       _kadai_status_elm.style.marginLeft = "10px";
-    } else if (day < 2) {
-      _kadai_status_elm.textContent = `明日`;
-      _kadai_status_elm.style.color = "crimson";
-      _kadai_status_elm.style.marginLeft = "10px";
     } else if (day < 3) {
-      _kadai_status_elm.textContent = `明後日`;
+      _kadai_status_elm.textContent = `あと${day}日`;
       _kadai_status_elm.style.color = "crimson";
       _kadai_status_elm.style.marginLeft = "10px";
     } else if (day < 7) {
@@ -326,7 +351,7 @@
       _kadai_status_elm.style.color = "firebrick";
       _kadai_status_elm.style.marginLeft = "10px";
     } else {
-      _kadai_status_elm.textContent = "課題あり(1週間以上先)";
+      _kadai_status_elm.textContent = "1週間以上先";
       _kadai_status_elm.style.color = "#FF4500";
       _kadai_status_elm.style.marginLeft = "10px";
     }
@@ -384,7 +409,7 @@
       let _hour = document.createElement("div");
       _hour.classList.add("period");
       _hour.textContent = hour[index];
-      _hour.style = `margin: 0px; padding: 0px 10px; width: ${_width}px; height: 40px;`;
+      _hour.style = `margin: 0px; padding: 0px 10px; width: ${_width}px; min-height: 40px;`;
       let td = document.createElement("td");
       td.appendChild(_hour);
       row.appendChild(td);
@@ -399,7 +424,7 @@
         let td = document.createElement("td");
         let _week = document.createElement("div");
         _week.textContent = week[index / 5];
-        _week.style = `margin: 0px; padding: 5px; width: 140px; height: 40px;`;
+        _week.style = `margin: 0px; padding: 5px; width: 140px; min-height: 40px;`;
         td.appendChild(_week);
         row.appendChild(td);
       }
@@ -408,7 +433,7 @@
         let copy = document.createElement("div");
         copy.classList.add("time-table");
         copy.textContent = "___";
-        copy.style = `margin: 0px; padding: 5px; width: ${_width}px; height: 40px;`;
+        copy.style = `margin: 0px; padding: 5px; width: ${_width}px; min-height: 40px;`;
         classes[index] = copy;
       }
       let td = document.createElement("td");
@@ -427,7 +452,7 @@
         let _td = document.createElement("td");
         let _week = document.createElement("div");
         _week.textContent = "集中講義等";
-        _week.style = `margin: 0px; padding: 5px; width: 140px; height: 40px;`;
+        _week.style = `margin: 0px; padding: 5px; width: 140px; min-height: 40px;`;
         _td.appendChild(_week);
         row.appendChild(_td);
       }
@@ -459,7 +484,7 @@
       let _week = document.createElement("div");
       _week.classList.add("week");
       _week.textContent = week[index];
-      _week.style = `margin: 0px; padding: 0px 10px; width: ${_width}px; height: 40px;`;
+      _week.style = `margin: 0px; padding: 0px 10px; width: ${_width}px; min-height: 40px;`;
       let td = document.createElement("td");
       td.appendChild(_week);
       row.appendChild(td);
@@ -474,7 +499,7 @@
         let td = document.createElement("td");
         let _hour = document.createElement("div");
         _hour.textContent = hour[index / 5];
-        _hour.style = `margin: 0px; padding: 5px; width: 140px; height: 40px;`;
+        _hour.style = `margin: 0px; padding: 5px; width: 140px; min-height: 40px;`;
         td.appendChild(_hour);
         row.appendChild(td);
       }
@@ -484,7 +509,7 @@
         let copy = document.createElement("div");
         copy.classList.add("time-table");
         copy.textContent = "___";
-        copy.style = `margin: 0px; padding: 5px; width: ${_width}px; height: 40px;`;
+        copy.style = `margin: 0px; padding: 5px; width: ${_width}px; min-height: 40px;`;
         classes[_index] = copy;
       }
       let td = document.createElement("td");
@@ -503,7 +528,7 @@
         let td = document.createElement("td");
         let _week = document.createElement("div");
         _week.textContent = "集中講義等";
-        _week.style = `margin: 0px; padding: 5px; width: 140px; height: 40px;`;
+        _week.style = `margin: 0px; padding: 5px; width: 140px; min-height: 40px;`;
         td.appendChild(_week);
         row.appendChild(td);
       }
@@ -521,8 +546,8 @@
   }
 
   function _addEvent(_class) {
-    if (_class.querySelector(".class-background") !== null) {
-      let _class_bgs = _class.querySelectorAll(".class-background");
+    if (_class.getElementsByClassName("class-background") !== null) {
+      let _class_bgs = _class.getElementsByClassName("class-background");
       for (let index = 0; index < _class_bgs.length; index++) {
         const _class_bg = _class_bgs[index];
         _class_bg.addEventListener(
@@ -541,14 +566,14 @@
         );
       }
     }
-    if (_class.querySelector(".time-table") !== null) {
-      let _time_table = _class.querySelector(".time-table");
+    if (_class.getElementsByClassName("time-table").length > 0) {
+      let _time_table = _class.getElementsByClassName("time-table")[0];
       _time_table.addEventListener(
         "mouseover",
         function () {
           _time_table.style.backgroundColor = "#D3D3D3";
-          _time_table.querySelector(".classe-dropdown").style =
-            "display: block; z-index: 99; position: relative;width: 70%; background-color: white; border: 1px solid; border-radius:10px;";
+          _time_table.getElementsByClassName("classe-dropdown")[0].style =
+            "display: block; z-index: 99; position: absolute; width: 13%; background-color: white; border: 1px solid; border-radius:10px;";
         },
         false
       );
@@ -556,7 +581,7 @@
         "mouseout",
         function () {
           _time_table.style.backgroundColor = "";
-          _time_table.querySelector(".classe-dropdown").style =
+          _time_table.getElementsByClassName("classe-dropdown")[0].style =
             "display: none;";
         },
         false

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "panda-mix-plus",
-  "version": "0.0.5",
+  "version": "0.0.7",
 
   "description": "This add-on makes it easier to use PandA, Kyoto University's learning support system.",
   "homepage_url": "https://github.com/OkanoShinri/PandA-Mix-Plus",
@@ -15,5 +15,8 @@
       "matches": ["https://panda.ecs.kyoto-u.ac.jp/*"],
       "js": ["src/content_scripts/content.js"]
     }
-  ]
+  ],
+  "background": {
+    "scripts": ["src/background-scripts/background.js"]
+  }
 }
