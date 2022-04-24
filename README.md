@@ -1,13 +1,15 @@
 # PandA-Mix-Plus
 
-[https://addons.mozilla.org/ja/firefox/addon/panda-mix-plus/](https://addons.mozilla.org/ja/firefox/addon/panda-mix-plus/)
-
 PandAを時間割のように表示したりするアドオン  
 由来は時間割が多段タブのように見えることから
 
 ![image](https://user-images.githubusercontent.com/72956592/164977777-39a3e317-6ff1-407a-9fc4-34053b68c352.png)
 
-## Chrome(またはChromiumベースのブラウザ)ユーザーの方へ
+## Firefoxユーザーの方
+
+[https://addons.mozilla.org/ja/firefox/addon/panda-mix-plus/](https://addons.mozilla.org/ja/firefox/addon/panda-mix-plus/)から入れてください。
+
+## Chrome(またはChromiumベースのブラウザ)ユーザーの方
 
 開発者がChromeストアの登録料5ドルを出し渋っているため、Chromeストアでは公開されていません。なので、手動でインストールしていただく必要があります。
 
