@@ -15,7 +15,9 @@
 
   //通知エリアの削除
   let b = document.getElementsByClassName("pasystem-banner-alerts")[0];
-  b.style.display = "none";
+  if (typeof b !== undefined) {
+    b.style.display = "none";
+  }
 
   //ロゴにリンク張る
   let top_nav = document.getElementById("topnav_container");
@@ -252,11 +254,13 @@
           );
 
           if (title == "課題") {
-            const kadai_time_left = await getKadaiTimeLeft(id);
+            const kadai_time_data = await getKadaiTimeLeft(id);
 
-            if (kadai_time_left > 0) {
-              _div.appendChild(_makeKadaiStatusElem(kadai_time_left));
-              copy.appendChild(_makeKadaiIconElem(kadai_time_left));
+            if (kadai_time_data["time-left"] > 0) {
+              _div.appendChild(_makeKadaiStatusElem(kadai_time_data));
+              copy.appendChild(
+                _makeKadaiIconElem(kadai_time_data["time-left"])
+              );
             }
           }
           _a.appendChild(_div);
@@ -289,6 +293,7 @@
     //0: 無し 1:1週間以上 2:1週間以内 3:1日以内
     //
     let left = Number.MAX_SAFE_INTEGER;
+    let day = "";
     const kadai_fetch = await fetch(
       `https://panda.ecs.kyoto-u.ac.jp/direct/assignment/site/${id}/pages.json`
     )
@@ -307,17 +312,18 @@
       ) {
         if (_getMsTimeLeft(kadai_info.dropDeadTimeString) < left) {
           left = _getMsTimeLeft(kadai_info.dropDeadTimeString);
+          day = kadai_info.dropDeadTimeString;
         }
       }
     }
     if (left === Number.MAX_SAFE_INTEGER) {
       return -1;
     }
-    return left;
+    let data = { "time-left": left, day: day };
+    return data;
   }
 
   function _getMsTimeLeft(date) {
-    let res = Number.MAX_SAFE_INTEGER;
     const ts = Date.parse(date);
     const limit = new Date(ts);
     const now = new Date();
@@ -326,7 +332,10 @@
     return delta;
   }
 
-  function _makeKadaiStatusElem(kadai_time_left) {
+  function _makeKadaiStatusElem(kadai_time_data) {
+    const kadai_time_left = kadai_time_data["time-left"];
+    const _limit_day = new Date(kadai_time_data["day"]);
+    const limit_day = _limit_day.toLocaleString();
     let _kadai_status_elm = document.createElement("span");
     const day = Math.floor(kadai_time_left / 86400000);
     const hour = Math.floor(kadai_time_left / 3600000);
@@ -335,23 +344,23 @@
     if (_kadai_status_elm < 0) {
       _kadai_status_elm.textContent = "";
     } else if (hour < 1) {
-      _kadai_status_elm.textContent = `あと${minute}分`;
-      _kadai_status_elm.style.color = "red";
+      _kadai_status_elm.textContent = `提出期限まであと${minute}分`;
+      _kadai_status_elm.style.color = "#9e0008";
       _kadai_status_elm.style.marginLeft = "10px";
     } else if (day < 1) {
-      _kadai_status_elm.textContent = `あと${hour}時間`;
-      _kadai_status_elm.style.color = "red";
+      _kadai_status_elm.textContent = `提出期限まであと${hour}時間`;
+      _kadai_status_elm.style.color = "#9e0008";
       _kadai_status_elm.style.marginLeft = "10px";
     } else if (day < 3) {
-      _kadai_status_elm.textContent = `あと${day}日`;
+      _kadai_status_elm.textContent = `期限: ${limit_day}`;
       _kadai_status_elm.style.color = "crimson";
       _kadai_status_elm.style.marginLeft = "10px";
     } else if (day < 7) {
-      _kadai_status_elm.textContent = `あと${day}日`;
+      _kadai_status_elm.textContent = `期限: ${limit_day}`;
       _kadai_status_elm.style.color = "firebrick";
       _kadai_status_elm.style.marginLeft = "10px";
     } else {
-      _kadai_status_elm.textContent = "1週間以上先";
+      _kadai_status_elm.textContent = `期限: ${limit_day}`;
       _kadai_status_elm.style.color = "#FF4500";
       _kadai_status_elm.style.marginLeft = "10px";
     }
@@ -360,9 +369,18 @@
 
   function _makeKadaiIconElem(kadai_time_left) {
     let _kadai_icon_elm = document.createElement("span");
+    //_kadai_icon_elm.style.marginLeft = "10px";
+    /*
+    _kadai_icon_elm.style.paddingLeft = "2px";
+    _kadai_icon_elm.style.paddingRight = "2px";
+    _kadai_icon_elm.style.fontSize = "1.5em";
+    _kadai_icon_elm.style.border = "solid gray 0.5px";
+    _kadai_icon_elm.style.borderRadius = "5px";
+    */
     const day = kadai_time_left / 86400000;
     const hour = kadai_time_left / 3600000;
 
+    /*
     if (kadai_time_left < 0) {
       _kadai_icon_elm.textContent = "";
     } else if (hour < 1) {
@@ -389,6 +407,23 @@
       _kadai_icon_elm.textContent = "●";
       _kadai_icon_elm.style.color = "#FF4500";
       _kadai_icon_elm.style.marginLeft = "10px";
+    }
+    */
+    if (kadai_time_left < 0) {
+      _kadai_icon_elm.textContent = "";
+    } else if (hour < 3) {
+      _kadai_icon_elm.textContent = " やれ";
+      _kadai_icon_elm.style.color = "#9e0008";
+      _kadai_icon_elm.style.fontWeight = "bold";
+    } else if (day < 7) {
+      _kadai_icon_elm.textContent = ` - あと${Math.floor(day) + 1}日`;
+      //_kadai_icon_elm.style.fontSize = `${(7 - day) / 14 + 1.0}em`;
+      _kadai_icon_elm.style.color = "#9e0008";
+      _kadai_icon_elm.style.fontWeight = "bold";
+    } else {
+      _kadai_icon_elm.textContent = " - まだ先";
+      _kadai_icon_elm.style.fontSize = "1.0em";
+      _kadai_icon_elm.style.color = "#FF4500";
     }
     return _kadai_icon_elm;
   }

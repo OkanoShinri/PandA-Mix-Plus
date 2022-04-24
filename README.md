@@ -5,7 +5,7 @@
 PandAを時間割のように表示したりするアドオン  
 由来は時間割が多段タブのように見えることから
 
-![image](https://user-images.githubusercontent.com/72956592/163681707-00391701-e521-433a-8857-1a58c83e894a.png)
+![image](https://user-images.githubusercontent.com/72956592/164977777-39a3e317-6ff1-407a-9fc4-34053b68c352.png)
 
 ## Chrome(またはChromiumベースのブラウザ)ユーザーの方へ
 
