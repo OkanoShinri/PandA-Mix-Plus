@@ -105,3 +105,4 @@ dist
 
 .sakai/*
 package-lock.json
+.vscode/*

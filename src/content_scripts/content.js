@@ -1,4 +1,6 @@
 (function () {
+  let top_nav = document.getElementById("topnav_container");
+
   //縦横切り替えの設定
   let row_is_period = false;
   browser.storage.local
@@ -20,8 +22,6 @@
   }
 
   //ロゴにリンク張る
-  let top_nav = document.getElementById("topnav_container");
-  document.getElementById("topnav").style.display = "none";
   let home_ref = document
     .getElementById("topnav")
     .querySelector("li")
@@ -108,6 +108,7 @@
   );
 
   makeClassElements(source_classes).then((classes) => {
+    document.getElementById("topnav").style.display = "none";
     const period_time_table = makePeriodTimeTable(classes);
     period_time_table.style.display = "block";
     top_nav.appendChild(period_time_table);
@@ -335,7 +336,9 @@
   function _makeKadaiStatusElem(kadai_time_data) {
     const kadai_time_left = kadai_time_data["time-left"];
     const _limit_day = new Date(kadai_time_data["day"]);
-    const limit_day = _limit_day.toLocaleString();
+    let limit_day_w_second = _limit_day.toLocaleString().split(":");
+    limit_day_w_second.pop();
+    const limit_day = limit_day_w_second.join(":");
     let _kadai_status_elm = document.createElement("span");
     const day = Math.floor(kadai_time_left / 86400000);
     const hour = Math.floor(kadai_time_left / 3600000);
@@ -343,17 +346,13 @@
 
     if (_kadai_status_elm < 0) {
       _kadai_status_elm.textContent = "";
-    } else if (hour < 1) {
-      _kadai_status_elm.textContent = `提出期限まであと${minute}分`;
-      _kadai_status_elm.style.color = "#9e0008";
-      _kadai_status_elm.style.marginLeft = "10px";
     } else if (day < 1) {
-      _kadai_status_elm.textContent = `提出期限まであと${hour}時間`;
+      _kadai_status_elm.textContent = `期限: ${limit_day}`;
       _kadai_status_elm.style.color = "#9e0008";
       _kadai_status_elm.style.marginLeft = "10px";
     } else if (day < 3) {
       _kadai_status_elm.textContent = `期限: ${limit_day}`;
-      _kadai_status_elm.style.color = "crimson";
+      _kadai_status_elm.style.color = "#9e0008";
       _kadai_status_elm.style.marginLeft = "10px";
     } else if (day < 7) {
       _kadai_status_elm.textContent = `期限: ${limit_day}`;
@@ -415,6 +414,11 @@
       _kadai_icon_elm.textContent = " やれ";
       _kadai_icon_elm.style.color = "#9e0008";
       _kadai_icon_elm.style.fontWeight = "bold";
+    } else if (day < 1) {
+      _kadai_icon_elm.textContent = ` - あと${Math.floor(hour)}時間`;
+      //_kadai_icon_elm.style.fontSize = `${(7 - day) / 14 + 1.0}em`;
+      _kadai_icon_elm.style.color = "#9e0008";
+      _kadai_icon_elm.style.fontWeight = "bold";
     } else if (day < 7) {
       _kadai_icon_elm.textContent = ` - あと${Math.floor(day) + 1}日`;
       //_kadai_icon_elm.style.fontSize = `${(7 - day) / 14 + 1.0}em`;
@@ -454,7 +458,7 @@
       if (index % 5 == 0) {
         var row = document.createElement("tr");
         if (Math.floor(index / 5) % 2) {
-          row.style.backgroundColor = "rgb(244, 244, 244)";
+          row.style.backgroundColor = "#f3f3f4";
         }
         let td = document.createElement("td");
         let _week = document.createElement("div");
@@ -483,7 +487,7 @@
     for (let index = 25; index < classes.length; index++) {
       if (index % 5 == 0) {
         var row = document.createElement("tr");
-        row.style.backgroundColor = "rgb(244, 244, 244)";
+        row.style.backgroundColor = "#f3f3f4";
         let _td = document.createElement("td");
         let _week = document.createElement("div");
         _week.textContent = "集中講義等";
@@ -529,7 +533,7 @@
       if (index % 5 == 0) {
         var row = document.createElement("tr");
         if (Math.floor(index / 5) % 2) {
-          row.style.backgroundColor = "rgb(244, 244, 244)";
+          row.style.backgroundColor = "#f3f3f4";
         }
         let td = document.createElement("td");
         let _hour = document.createElement("div");
@@ -559,7 +563,7 @@
     for (let index = 25; index < classes.length; index++) {
       if (index % 5 == 0) {
         var row = document.createElement("tr");
-        row.style.backgroundColor = "rgb(244, 244, 244)";
+        row.style.backgroundColor = "#f3f3f4";
         let td = document.createElement("td");
         let _week = document.createElement("div");
         _week.textContent = "集中講義等";
@@ -588,7 +592,7 @@
         _class_bg.addEventListener(
           "mouseover",
           function () {
-            _class_bg.style.backgroundColor = "#D3D3D3";
+            _class_bg.style.backgroundColor = "#cbcbcb";
           },
           false
         );
@@ -606,7 +610,7 @@
       _time_table.addEventListener(
         "mouseover",
         function () {
-          _time_table.style.backgroundColor = "#D3D3D3";
+          _time_table.style.backgroundColor = "#cbcbcb";
           _time_table.getElementsByClassName("classe-dropdown")[0].style =
             "display: block; z-index: 99; position: absolute; width: 13%; background-color: white; border: 1px solid; border-radius:10px;";
         },
